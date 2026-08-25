@@ -1,8 +1,13 @@
 package com.mefabc24.werewolf.request
 
+import com.mefabc24.werewolf.game.GameController
+import com.mefabc24.werewolf.lobby.LobbyController
 import com.mefabc24.werewolf.network.*
 
-class RequestHandler {
+class RequestHandler(
+    private val gameController: GameController,
+    private val lobbyController: LobbyController
+) {
 
     fun handle(playerId: Int, request: Request): RequestResult =
         when (request) {

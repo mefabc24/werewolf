@@ -1,5 +1,6 @@
 package com.mefabc24.werewolf
 
+import com.mefabc24.werewolf.game.GameController
 import com.mefabc24.werewolf.lobby.Lobby
 import com.mefabc24.werewolf.lobby.LobbyController
 import com.mefabc24.werewolf.network.ConnectedResponse
@@ -28,10 +29,11 @@ class GameServer {
 
     private val lobby = Lobby()
     private val lobbyController = LobbyController(lobby)
+    private val gameController = GameController()
 
     private var nextPlayerId: Int = 1
 
-    private val requestHandler = RequestHandler()
+    private val requestHandler = RequestHandler(gameController, lobbyController)
 
     fun start() {
         server = embeddedServer(Netty, 8080) {
