@@ -13,3 +13,6 @@ data object PlaceholderRequest : Request
 data class MessageRequest(
     val message: String
 ) : Request
+
+@Serializable
+data object StartGameRequest : Request
