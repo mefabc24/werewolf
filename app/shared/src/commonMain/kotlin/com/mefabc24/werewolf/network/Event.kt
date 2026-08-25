@@ -29,6 +29,3 @@ data class MessageEvent(
 
 @Serializable
 data object GameStartedEvent : Event
-
-@Serializable
-data class ErrorResponse(val message: String) : Event

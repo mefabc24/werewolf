@@ -18,3 +18,6 @@ data class ConnectedResponse(
 
 @Serializable
 data object GameStartedResponse : Response
+
+@Serializable
+data class ErrorResponse(val message: String) : Response
