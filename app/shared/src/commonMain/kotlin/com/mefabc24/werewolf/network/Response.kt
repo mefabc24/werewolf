@@ -15,3 +15,6 @@ data class ConnectedResponse(
     val playerId: Int,
     val players: List<PlayerInfo>
 ) : Response
+
+@Serializable
+data object GameStartedResponse : Response
