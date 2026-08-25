@@ -26,3 +26,6 @@ data class MessageEvent(
     val playerId: Int,
     val message: String
 ) : Event
+
+@Serializable
+data object GameStartedEvent : Event
