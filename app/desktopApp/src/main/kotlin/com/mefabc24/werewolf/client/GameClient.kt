@@ -1,7 +1,10 @@
 package com.mefabc24.werewolf.client
 
 import com.mefabc24.werewolf.network.ConnectedResponse
+import com.mefabc24.werewolf.network.ErrorResponse
 import com.mefabc24.werewolf.network.Event
+import com.mefabc24.werewolf.network.GameStartedEvent
+import com.mefabc24.werewolf.network.GameStartedResponse
 import com.mefabc24.werewolf.network.MessageEvent
 import com.mefabc24.werewolf.network.PlaceholderEvent
 import com.mefabc24.werewolf.network.PlaceholderResponse
@@ -114,6 +117,8 @@ class GameClient {
 
                 println("Connected as $playerName (ID: ${response.playerId})")
             }
+            is GameStartedResponse -> println("Game started successfully")
+            is ErrorResponse -> println("Error: ${response.message}")
         }
     }
 
@@ -135,6 +140,7 @@ class GameClient {
 
                 println("$playerName: ${event.message}")
             }
+            is GameStartedEvent -> println("Game started")
         }
     }
 }
