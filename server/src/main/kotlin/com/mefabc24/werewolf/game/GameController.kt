@@ -31,6 +31,7 @@ class GameController(
             gamePhase = gameState.gamePhase,
             nightPhase = gameState.nightPhase,
             round = gameState.round,
+            hasVoted = gameState.votes.map { it.voterId }.toMutableSet(),
             werewolfIds = werewolfIds
         )
     }
