@@ -1,5 +1,6 @@
 package com.mefabc24.werewolf.network
 
+import com.mefabc24.werewolf.game.ClientGameState
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -28,4 +29,4 @@ data class MessageEvent(
 ) : Event
 
 @Serializable
-data object GameStartedEvent : Event
+data class GameStartedEvent(val gameState: ClientGameState) : Event
