@@ -16,15 +16,24 @@ class EventHandler(
         when (event) {
             is PlaceholderEvent -> println("Event received: $event")
             is PlayerJoinedEvent -> {
-                state.players.add(PlayerInfo(event.playerId, event.playerName))
+                state.gameState = state.gameState.copy(
+                    players = state.gameState.players + PlayerInfo(
+                        event.playerId,
+                        event.playerName
+                    )
+                )
                 println("Player joined: ${event.playerName} (ID: ${event.playerId})")
             }
             is PlayerLeftEvent -> {
-                state.players.remove(PlayerInfo(event.playerId, event.playerName))
+                state.gameState = state.gameState.copy(
+                    players = state.gameState.players.filter {
+                        it.playerId != event.playerId
+                    }
+                )
                 println("Player left: ${event.playerName} (ID: ${event.playerId})")
             }
             is MessageEvent -> {
-                val playerName = state.players
+                val playerName = state.gameState.players
                     .find { it.playerId == event.playerId }
                     ?.playerName
 

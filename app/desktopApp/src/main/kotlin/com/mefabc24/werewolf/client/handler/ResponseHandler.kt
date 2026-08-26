@@ -1,6 +1,7 @@
 package com.mefabc24.werewolf.client.handler
 
 import com.mefabc24.werewolf.client.ClientState
+import com.mefabc24.werewolf.game.ClientGameState
 import com.mefabc24.werewolf.network.ConnectedResponse
 import com.mefabc24.werewolf.network.ErrorResponse
 import com.mefabc24.werewolf.network.GameStartedResponse
@@ -17,10 +18,11 @@ class ResponseHandler(
             is ConnectedResponse -> {
                 state.playerId = response.playerId
 
-                state.players.clear()
-                state.players.addAll(response.players)
+                state.gameState = state.gameState.copy(
+                    players = response.players
+                )
 
-                val playerName = state.players
+                val playerName = state.gameState.players
                     .find { it.playerId == state.playerId }
                     ?.playerName
 
