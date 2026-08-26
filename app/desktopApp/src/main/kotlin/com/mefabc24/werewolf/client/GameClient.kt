@@ -1,18 +1,8 @@
 package com.mefabc24.werewolf.client
 
-import com.mefabc24.werewolf.network.ConnectedResponse
-import com.mefabc24.werewolf.network.ErrorResponse
-import com.mefabc24.werewolf.network.Event
-import com.mefabc24.werewolf.network.GameStartedEvent
-import com.mefabc24.werewolf.network.GameStartedResponse
-import com.mefabc24.werewolf.network.MessageEvent
-import com.mefabc24.werewolf.network.PlaceholderEvent
-import com.mefabc24.werewolf.network.PlaceholderResponse
-import com.mefabc24.werewolf.network.PlayerJoinedEvent
-import com.mefabc24.werewolf.network.PlayerLeftEvent
-import com.mefabc24.werewolf.network.Request
-import com.mefabc24.werewolf.network.Response
-import com.mefabc24.werewolf.player.PlayerInfo
+import com.mefabc24.werewolf.client.handler.EventHandler
+import com.mefabc24.werewolf.client.handler.ResponseHandler
+import com.mefabc24.werewolf.network.*
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.websocket.*
@@ -28,13 +18,13 @@ import kotlinx.coroutines.Dispatchers
 import io.ktor.http.*
 
 class GameClient {
+    private val state = ClientState()
+
     private var session: DefaultClientWebSocketSession? = null
     private var receiveJob: Job? = null
 
-    val players: List<PlayerInfo>
-        field: MutableList<PlayerInfo> = mutableListOf()
-
-    private var playerId: Int? = null
+    private val eventHandler = EventHandler(state)
+    private val responseHandler = ResponseHandler(state)
 
     private val client = HttpClient(CIO) {
         install(WebSockets)
@@ -49,7 +39,6 @@ class GameClient {
                 parameters.append("name", name)
             }
         }
-
 
         receiveJob = CoroutineScope(Dispatchers.Default).launch {
             receiveMessage()
@@ -90,57 +79,15 @@ class GameClient {
     private fun handleMessage(message: String) {
         try {
             val response = Json.decodeFromString<Response>(message)
-            handleResponse(response)
+            responseHandler.handle(response)
             return
         } catch (_: Exception) {}
 
         try {
             val event = Json.decodeFromString<Event>(message)
-            handleEvent(event)
+            eventHandler.handle(event)
             return
         } catch (_: Exception) {}
 
-    }
-
-    private fun handleResponse(response: Response) {
-        when (response) {
-            is PlaceholderResponse -> println("Response received: $response")
-            is ConnectedResponse -> {
-                playerId = response.playerId
-
-                players.clear()
-                players.addAll(response.players)
-
-                val playerName = players
-                    .find { it.playerId == playerId }
-                    ?.playerName
-
-                println("Connected as $playerName (ID: ${response.playerId})")
-            }
-            is GameStartedResponse -> println("Game started successfully")
-            is ErrorResponse -> println("Error: ${response.message}")
-        }
-    }
-
-    private fun handleEvent(event: Event) {
-        when (event) {
-            is PlaceholderEvent -> println("Event received: $event")
-            is PlayerJoinedEvent -> {
-                players.add(PlayerInfo(event.playerId, event.playerName))
-                println("Player joined: ${event.playerName} (ID: ${event.playerId})")
-            }
-            is PlayerLeftEvent -> {
-                players.remove(PlayerInfo(event.playerId, event.playerName))
-                println("Player left: ${event.playerName} (ID: ${event.playerId})")
-            }
-            is MessageEvent -> {
-                val playerName = players
-                    .find { it.playerId == event.playerId }
-                    ?.playerName
-
-                println("$playerName: ${event.message}")
-            }
-            is GameStartedEvent -> println("Game started")
-        }
     }
 }
