@@ -19,14 +19,18 @@ class RequestHandler(
                 event = MessageEvent(playerId, request.message)
             )
             is StartGameRequest -> {
-                if (lobbyController.isHost(playerId)) {
-                    RequestResult(
-                        response = GameStartedResponse,
-                        event = GameStartedEvent
-                    )
-                } else {
+                if (!lobbyController.isHost(playerId)) {
                     RequestResult(
                         response = ErrorResponse("Only the host can start the game.")
+                    )
+                } else {
+                    gameController.start(lobbyController.getPlayers())
+
+                    val clientGameState = gameController.getClientGameState(playerId)
+
+                    RequestResult(
+                        response = GameStartedResponse,
+                        event = GameStartedEvent(clientGameState)
                     )
                 }
             }
