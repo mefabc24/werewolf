@@ -1,6 +1,8 @@
 package com.mefabc24.werewolf
 
 import com.mefabc24.werewolf.game.GameController
+import com.mefabc24.werewolf.game.GamePhase
+import com.mefabc24.werewolf.game.GameState
 import com.mefabc24.werewolf.lobby.Lobby
 import com.mefabc24.werewolf.lobby.LobbyController
 import com.mefabc24.werewolf.network.ConnectedResponse
@@ -17,8 +19,10 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.websocket.*
 import io.ktor.server.netty.Netty
 import io.ktor.server.routing.routing
+import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
+import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import io.ktor.websocket.send
 import kotlinx.serialization.json.Json
@@ -29,7 +33,9 @@ class GameServer {
 
     private val lobby = Lobby()
     private val lobbyController = LobbyController(lobby)
-    private val gameController = GameController()
+
+    private val gameState = GameState()
+    private val gameController = GameController(gameState)
 
     private var nextPlayerId: Int = 1
 
@@ -41,6 +47,16 @@ class GameServer {
 
             routing {
                 webSocket("/werewolf") {
+                    if (gameState.gamePhase != GamePhase.LOBBY) {
+                        close(
+                            CloseReason(
+                                CloseReason.Codes.VIOLATED_POLICY,
+                                "Game already in progress"
+                            )
+                        )
+                        return@webSocket
+                    }
+
                     val name = call.request.queryParameters["name"] ?: return@webSocket  // will be used later when Player model exists
                     val playerId = nextPlayerId++
 
