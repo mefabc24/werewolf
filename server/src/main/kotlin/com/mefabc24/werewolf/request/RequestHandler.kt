@@ -18,6 +18,18 @@ class RequestHandler(
             is MessageRequest -> RequestResult(
                 event = MessageEvent(playerId, request.message)
             )
+            is StartGameRequest -> {
+                if (lobbyController.isHost(playerId)) {
+                    RequestResult(
+                        response = GameStartedResponse,
+                        event = GameStartedEvent
+                    )
+                } else {
+                    RequestResult(
+                        response = ErrorResponse("Only the host can start the game.")
+                    )
+                }
+            }
         }
 }
 
