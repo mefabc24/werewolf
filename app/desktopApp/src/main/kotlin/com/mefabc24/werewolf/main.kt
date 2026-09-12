@@ -2,14 +2,7 @@ package com.mefabc24.werewolf
 
 import com.mefabc24.werewolf.client.GameClient
 import com.mefabc24.werewolf.game.ClientGameState
-import com.mefabc24.werewolf.network.HunterActionRequest
-import com.mefabc24.werewolf.network.MessageRequest
-import com.mefabc24.werewolf.network.PlaceholderRequest
-import com.mefabc24.werewolf.network.SeerActionRequest
-import com.mefabc24.werewolf.network.StartGameRequest
-import com.mefabc24.werewolf.network.VoteRequest
-import com.mefabc24.werewolf.network.WerewolfActionRequest
-import com.mefabc24.werewolf.network.WitchActionRequest
+import com.mefabc24.werewolf.network.*
 import kotlinx.coroutines.runBlocking
 
 fun main() = runBlocking {
