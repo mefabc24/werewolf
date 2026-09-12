@@ -12,11 +12,6 @@ class RequestHandler(
 
     suspend fun handle(playerId: Int, request: Request): RequestResult =
         when (request) {
-            is PlaceholderRequest -> RequestResult(
-                response = PlaceholderResponse,
-                event = PlaceholderEvent
-            )
-
             is MessageRequest -> RequestResult(
                 event = MessageEvent(playerId, request.message)
             )

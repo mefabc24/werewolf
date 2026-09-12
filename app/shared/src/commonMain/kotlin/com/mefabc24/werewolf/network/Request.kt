@@ -7,9 +7,6 @@ sealed interface Request
 
 // General requests
 @Serializable
-data object PlaceholderRequest : Request
-
-@Serializable
 data class MessageRequest(
     val message: String
 ) : Request

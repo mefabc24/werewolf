@@ -13,8 +13,6 @@ class EventHandler(
 ) {
     fun handle(event: Event) {
         when (event) {
-            is PlaceholderEvent -> println("Event received: $event")
-
             is PlayerJoinedEvent -> {
                 clientState.gameState = clientState.gameState.copy(
                     players = clientState.gameState.players + PlayerInfo(

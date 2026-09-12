@@ -11,9 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface Event
 
-// Placeholder and lobby
-@Serializable
-data object PlaceholderEvent : Event
+// Lobby
 
 @Serializable
 data class PlayerJoinedEvent(

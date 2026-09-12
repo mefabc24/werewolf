@@ -8,9 +8,6 @@ sealed interface Response
 
 // Connection and lobby
 @Serializable
-data object PlaceholderResponse : Response
-
-@Serializable
 data class ConnectedResponse(
     val playerId: Int,
     val players: List<PlayerInfo>

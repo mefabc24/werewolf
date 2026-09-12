@@ -29,8 +29,6 @@ fun main() = runBlocking {
                 gameClient.connect("${input.getOrNull(1) ?: "Host Client"} (Host)")
             }
 
-            "test" -> gameClient.send(PlaceholderRequest)
-
             "echo" -> gameClient.send(
                 MessageRequest(input.drop(1).joinToString(" "))
             )
