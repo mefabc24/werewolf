@@ -1,24 +1,14 @@
 package com.mefabc24.werewolf.game
 
-import com.mefabc24.werewolf.game.actions.Action
-import com.mefabc24.werewolf.game.actions.SeerAction
-import com.mefabc24.werewolf.game.actions.WerewolfAction
-import com.mefabc24.werewolf.game.actions.WitchAction
-import com.mefabc24.werewolf.game.managers.PhaseManager
-import com.mefabc24.werewolf.game.managers.RoleManager
-import com.mefabc24.werewolf.game.managers.VotingManager
+import com.mefabc24.werewolf.game.actions.*
+import com.mefabc24.werewolf.game.managers.*
 import com.mefabc24.werewolf.game.results.NightResult
 import com.mefabc24.werewolf.game.role.SeerState
 import com.mefabc24.werewolf.game.role.WitchState
 import com.mefabc24.werewolf.network.*
 import com.mefabc24.werewolf.player.Player
 import com.mefabc24.werewolf.player.PlayerInfo
-import com.mefabc24.werewolf.player.role.Mayor
-import com.mefabc24.werewolf.player.role.Seer
-import com.mefabc24.werewolf.player.role.Team
-import com.mefabc24.werewolf.player.role.Villager
-import com.mefabc24.werewolf.player.role.Werewolf
-import com.mefabc24.werewolf.player.role.Witch
+import com.mefabc24.werewolf.player.role.*
 import com.mefabc24.werewolf.settings.GameSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -62,6 +52,7 @@ class GameController(
                 is Witch -> gameState.witchStates[player.id] = WitchState()
                 is Seer -> gameState.seerStates[player.id] = SeerState()
 
+                is Hunter -> {}
                 is Werewolf -> {}
                 is Villager -> {}
                 is Mayor -> {}
@@ -69,10 +60,10 @@ class GameController(
             }
         }
 
-        for (player in gameState.players) {
+        for ((id) in gameState.players) {
             notifyClients(
-                GameStartedEvent(generateClientGameState(player.id)),
-                setOf(player.id)
+                GameStartedEvent(generateClientGameState(id)),
+                setOf(id)
             )
         }
 
@@ -155,9 +146,7 @@ class GameController(
         currentNightResult = null
 
         nightResult.killedPlayerIds.forEach { id ->
-            killPlayer(id)
-            notifyClients(YouDiedEvent(DeathCause.NIGHT), setOf(id))
-            notifyClients(RoleRevealEvent(id, requirePlayer(id).role!!))
+            handlePlayerDeath(id, DeathCause.NIGHT)
         }
 
         notifyClients(NightEndedEvent(nightResult.killedPlayerIds))
@@ -171,21 +160,12 @@ class GameController(
             },
             onVotingResolved = { votedPlayerId ->
                 votedPlayerId?.let {id ->
-                    killPlayer(id)
-
-                    notifyClients(
-                        YouDiedEvent(DeathCause.VOTED_OUT),
-                        setOf(id)
-                    )
-
-                    notifyClients(RoleRevealEvent(id, requirePlayer(id).role!!))
+                    handlePlayerDeath(id, DeathCause.VOTED_OUT)
                 }
 
                 notifyClients(VotingFinishedEvent(votedPlayerId))
             }
         )
-
-
     }
 
     private suspend fun checkAndHandleWin(): Boolean {
@@ -197,8 +177,37 @@ class GameController(
         return false
     }
 
+    private suspend fun handlePlayerDeath(
+        playerId: Int,
+        cause: DeathCause
+    ) {
+        val player = requirePlayer(playerId)
+
+        killPlayer(player.id)
+
+        notifyClients(PlayerDiedEvent(playerId, cause))
+        notifyClients(RoleRevealEvent(playerId, player.role!!))
+
+        if (player.role == Hunter) {
+            handleHunterDeath(playerId)
+        }
+    }
+
     private fun killPlayer(playerId: Int) {
         requirePlayer(playerId).isAlive = false
+    }
+
+    private suspend fun handleHunterDeath(playerId: Int) {
+        val action = phaseManager.awaitPlayerAction(playerId) { playerIds ->
+            notifyClients(HunterTurnEvent, playerIds)
+        } as? HunterAction ?: return
+
+        action.targetId?.let { targetId ->
+            handlePlayerDeath(
+                targetId,
+                DeathCause.HUNTER
+            )
+        }
     }
 
     private fun checkWinCondition(): Team? {
@@ -221,8 +230,6 @@ class GameController(
     ): Boolean {
         val player = getPlayer(playerId) ?: return false
 
-        if (!player.isAlive) return false
-
         val validAction = when (action) {
             is WerewolfAction ->
                 gameState.nightPhase == NightPhase.WEREWOLVES &&
@@ -243,6 +250,12 @@ class GameController(
                 gameState.nightPhase == NightPhase.SEER &&
                         player.role == Seer &&
                         isValidSeerTarget(player, action.targetId)
+            }
+
+            is HunterAction -> {
+                !player.isAlive &&
+                        player.role == Hunter &&
+                        isValidHunterTarget(player, action.targetId)
             }
 
         }
@@ -301,6 +314,15 @@ class GameController(
         return target.id != player.id &&
                 target.isAlive &&
                 target.id !in seerState.seenPlayerIds
+    }
+
+    private fun isValidHunterTarget(player: Player, targetId: Int?): Boolean {
+        if (targetId == null) return true
+
+        val target = getPlayer(targetId) ?: return false
+
+        return target.id != player.id &&
+                target.isAlive
     }
 
     private fun getPlayer(id: Int): Player? =

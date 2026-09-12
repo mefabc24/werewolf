@@ -1,9 +1,7 @@
 package com.mefabc24.werewolf.request
 
 import com.mefabc24.werewolf.game.GameController
-import com.mefabc24.werewolf.game.actions.SeerAction
-import com.mefabc24.werewolf.game.actions.WerewolfAction
-import com.mefabc24.werewolf.game.actions.WitchAction
+import com.mefabc24.werewolf.game.actions.*
 import com.mefabc24.werewolf.lobby.LobbyController
 import com.mefabc24.werewolf.network.*
 
@@ -85,6 +83,21 @@ class RequestHandler(
                         ActionAcceptedResponse
                     } else {
                         ErrorResponse("Invalid seer action.")
+                    }
+                )
+            }
+
+            is HunterActionRequest -> {
+                val success = gameController.submitAction(
+                    playerId,
+                    HunterAction(targetId = request.targetId)
+                )
+
+                RequestResult(
+                    response = if (success) {
+                        ActionAcceptedResponse
+                    } else {
+                        ErrorResponse("Invalid hunter action.")
                     }
                 )
             }

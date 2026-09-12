@@ -225,41 +225,52 @@ class PhaseManager(
         }
     }
 
-private suspend fun awaitActions(
-    playerIds: Set<Int>,
-    timeout: Duration?,
-    onPlayerTurn: suspend (Set<Int>) -> Unit
-): Map<Int, Action> {
-    val actions = playerIds.associateWith {
-        CompletableDeferred<Action>()
+    suspend fun awaitPlayerAction(
+        playerId: Int,
+        onPlayerTurn: suspend (Set<Int>) -> Unit
+    ): Action? {
+        return awaitAction(
+            playerId = playerId,
+            timeout = null,
+            onPlayerTurn = onPlayerTurn
+        )
     }
 
-    pendingActions.putAll(actions)
+    private suspend fun awaitActions(
+        playerIds: Set<Int>,
+        timeout: Duration?,
+        onPlayerTurn: suspend (Set<Int>) -> Unit
+    ): Map<Int, Action> {
+        val actions = playerIds.associateWith {
+            CompletableDeferred<Action>()
+        }
 
-    onPlayerTurn(playerIds)
+        pendingActions.putAll(actions)
 
-    return try {
-        if (timeout == null) {
-            actions.mapValues { (_, pendingAction) ->
-                pendingAction.await()
-            }
-        } else {
-            withTimeoutOrNull(timeout) {
-                actions.values.forEach { it.await() }
-            }
+        onPlayerTurn(playerIds)
 
-            actions
-                .filterValues { it.isCompleted }
-                .mapValues { (_, pendingAction) ->
+        return try {
+            if (timeout == null) {
+                actions.mapValues { (_, pendingAction) ->
                     pendingAction.await()
                 }
-        }
-    } finally {
-        playerIds.forEach {
-            pendingActions.remove(it)
+            } else {
+                withTimeoutOrNull(timeout) {
+                    actions.values.forEach { it.await() }
+                }
+
+                actions
+                    .filterValues { it.isCompleted }
+                    .mapValues { (_, pendingAction) ->
+                        pendingAction.await()
+                    }
+            }
+        } finally {
+            playerIds.forEach {
+                pendingActions.remove(it)
+            }
         }
     }
-}
 
     private fun requireWitchState(playerId: Int): WitchState =
         gameState.witchStates[playerId]

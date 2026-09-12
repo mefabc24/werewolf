@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface Event
 
-// Placeholder
+// Platzhalter und Lobby
 @Serializable
 data object PlaceholderEvent : Event
 
@@ -33,8 +33,18 @@ data class MessageEvent(
     val message: String
 ) : Event
 
+// Spielstart und Rundenbeginn
 @Serializable
 data class GameStartedEvent(val gameState: ClientGameState) : Event
+
+@Serializable
+data class RoundStartedEvent(val round: Int) : Event
+
+@Serializable
+data class RoleRevealEvent(
+    val playerId: Int,
+    val role: Role
+) : Event
 
 @Serializable
 data object NightStartedEvent : Event
@@ -54,7 +64,23 @@ data class WitchTurnEvent(
 data object SeerTurnEvent : Event
 
 @Serializable
+data object HunterTurnEvent : Event
+
+@Serializable
+data class NightEndedEvent(val killedPlayerIds: Set<Int>) : Event
+
+// Tagesphase und Abstimmung
+@Serializable
+data object DayStartedEvent : Event
+
+@Serializable
 data class DayPhaseStartedEvent(val phase: DayPhase) : Event
+
+@Serializable
+data class PlayerDiedEvent(
+    val playerId: Int,
+    val cause: DeathCause
+) : Event
 
 @Serializable
 data class PlayerVotedEvent(val playerId: Int) : Event
@@ -62,24 +88,7 @@ data class PlayerVotedEvent(val playerId: Int) : Event
 @Serializable
 data class VotingFinishedEvent(val killedPlayerId: Int?) : Event
 
-@Serializable
-data object DayStartedEvent : Event
-
-@Serializable
-data class NightEndedEvent(val killedPlayerIds: Set<Int>) : Event
-
-@Serializable
-data class RoundStartedEvent(val round: Int) : Event
-
-@Serializable
-data class YouDiedEvent(val cause: DeathCause) : Event
-
-@Serializable
-data class RoleRevealEvent(
-    val playerId: Int,
-    val role: Role
-) : Event
-
+// Spielende
 @Serializable
 data class GameWonEvent(val winningTeam: Team) : Event
 

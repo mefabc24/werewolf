@@ -87,11 +87,14 @@ class EventHandler(
                 val attackedPlayers = clientState.gameState.players
                     .filter { it.id in event.attackedPlayerIds }
 
+                println("It's witch turn. You can now perform your action.")
                 println(
                     "Werewolf target(s): " +
                             attackedPlayers.joinToString { "${it.playerName} (${it.id})" }
                 )
             }
+
+            is HunterTurnEvent -> println("It's hunter turn. You can now perform your action.")
 
             is SeerTurnEvent -> println("It's seer turn. You can now perform your action.")
 
@@ -175,10 +178,21 @@ class EventHandler(
                 println("Round ${event.round} has started.")
             }
 
-            is YouDiedEvent -> {
-                when(event.cause) {
-                    DeathCause.NIGHT -> println("You have died during the night. You can no longer participate in the game.")
-                    DeathCause.VOTED_OUT -> println("You have been voted out. You can no longer participate in the game.")
+            is PlayerDiedEvent -> {
+                clientState.gameState = clientState.gameState.copy(
+                    players = clientState.gameState.players.map { player ->
+                        if (player.id == event.playerId) {
+                            player.copy(isAlive = false)
+                        } else {
+                            player
+                        }
+                    }
+                )
+
+                if (event.playerId == clientState.id) {
+                    println("You died: ${event.cause}")
+                } else {
+                    println("Player ${event.playerId} died: ${event.cause}")
                 }
             }
 

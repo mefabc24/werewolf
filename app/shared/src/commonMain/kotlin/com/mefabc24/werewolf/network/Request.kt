@@ -31,3 +31,6 @@ data class WitchActionRequest(
 
 @Serializable
 data class SeerActionRequest(val targetId: Int?) : Request
+
+@Serializable
+data class HunterActionRequest(val targetId: Int?) : Request

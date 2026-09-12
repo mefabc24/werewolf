@@ -2,6 +2,7 @@ package com.mefabc24.werewolf
 
 import com.mefabc24.werewolf.client.GameClient
 import com.mefabc24.werewolf.game.ClientGameState
+import com.mefabc24.werewolf.network.HunterActionRequest
 import com.mefabc24.werewolf.network.MessageRequest
 import com.mefabc24.werewolf.network.PlaceholderRequest
 import com.mefabc24.werewolf.network.SeerActionRequest
@@ -101,7 +102,15 @@ fun main() = runBlocking {
 
                 if (input.size == 2) gameClient.send(SeerActionRequest(targetId))
                 else println("Usage: seer <targetId>")
+            }
 
+            "hunter" -> {
+                val targetId = input.getOrNull(1)
+                    ?.takeUnless { it == "-" }
+                    ?.toIntOrNull()
+
+                if (input.size == 2) gameClient.send(HunterActionRequest(targetId))
+                else println("Usage: Hunter <targetId>")
             }
 
             "state" -> {
@@ -158,6 +167,7 @@ private fun printGameState(gameState: ClientGameState) {
             "Witch" -> "$purple${player.role}$reset"
             "Seer" -> "$blue${player.role}$reset"
             "Mayor" -> "$orange${player.role}$reset"
+            "Hunter" -> "$green${player.role}$reset"
             "Villager" -> "${gray}${player.role}$reset"
             else -> "${gray}Unknown$reset"
         }
