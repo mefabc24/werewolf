@@ -206,7 +206,12 @@ class EventHandler(
             }
 
             is GameEndedEvent -> {
-                clientState.gameState = ClientGameState()
+                clientState.gameState = clientState.gameState.copy(
+                    gamePhase = GamePhase.END,
+                    nightPhase = null,
+                    dayPhase = null
+                )
+
                 println("Game ended.")
             }
         }

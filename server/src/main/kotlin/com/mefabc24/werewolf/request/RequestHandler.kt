@@ -18,9 +18,11 @@ class RequestHandler(
                 response = PlaceholderResponse,
                 event = PlaceholderEvent
             )
+
             is MessageRequest -> RequestResult(
                 event = MessageEvent(playerId, request.message)
             )
+
             is StartGameRequest -> {
                 if (!lobbyController.isHost(playerId)) {
                     RequestResult(

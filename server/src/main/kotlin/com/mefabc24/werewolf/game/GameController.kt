@@ -47,7 +47,10 @@ class GameController(
     ) {
         resetState()
 
-        gameState.players.addAll(players)
+        gameState.players.addAll(
+            players.map { it.copy(role = null, isAlive = true) }
+        )
+
         gameState.settings = settings
         gameState.gamePhase = GamePhase.START
 
@@ -81,8 +84,6 @@ class GameController(
 
         gameJob?.cancel()
         gameJob = null
-
-        resetState()
     }
 
     private suspend fun gameLoop() {
