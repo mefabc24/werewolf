@@ -1,7 +1,6 @@
 package com.mefabc24.werewolf.client.handler
 
 import com.mefabc24.werewolf.client.ClientState
-import com.mefabc24.werewolf.game.ClientGameState
 import com.mefabc24.werewolf.game.DayPhase
 import com.mefabc24.werewolf.game.DeathCause
 import com.mefabc24.werewolf.game.GamePhase
