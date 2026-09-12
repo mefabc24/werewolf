@@ -40,7 +40,10 @@ class VotingManager(
             return false
         }
 
-        val voterRole = gameState.players.find { it.id == voterId }?.role ?: return false
+        val voter = gameState.players.find { it.id == voterId }
+            ?: return false
+
+        if (!voter.isAlive) return false
 
         gameState.votes.add(
             Vote(voterId, targetId)
