@@ -1,30 +1,29 @@
 package com.mefabc24.werewolf.client.handler
 
 import com.mefabc24.werewolf.client.ClientState
-import com.mefabc24.werewolf.game.ClientGameState
+import com.mefabc24.werewolf.network.ActionAcceptedResponse
 import com.mefabc24.werewolf.network.ConnectedResponse
 import com.mefabc24.werewolf.network.ErrorResponse
 import com.mefabc24.werewolf.network.GameStartedResponse
 import com.mefabc24.werewolf.network.PlaceholderResponse
 import com.mefabc24.werewolf.network.Response
+import com.mefabc24.werewolf.network.VoteAcceptedResponse
 
 class ResponseHandler(
-    private val state: ClientState
+    private val clientState: ClientState
 ) {
     fun handle(response: Response) {
         when (response) {
             is PlaceholderResponse -> println("Response received: $response")
 
             is ConnectedResponse -> {
-                state.playerId = response.playerId
+                clientState.id = response.playerId
 
-                state.gameState = state.gameState.copy(
+                clientState.gameState = clientState.gameState.copy(
                     players = response.players
                 )
 
-                val playerName = state.gameState.players
-                    .find { it.playerId == state.playerId }
-                    ?.playerName
+                val playerName = clientState.selfPlayer?.playerName
 
                 println("Connected as $playerName (ID: ${response.playerId})")
             }
@@ -32,6 +31,10 @@ class ResponseHandler(
             is GameStartedResponse -> println("Game started successfully")
 
             is ErrorResponse -> println("Error: ${response.message}")
+
+            is ActionAcceptedResponse -> println("Action was successful")
+
+            is VoteAcceptedResponse -> println("Vote was successful")
         }
     }
 }

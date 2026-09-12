@@ -5,12 +5,7 @@ import com.mefabc24.werewolf.game.GamePhase
 import com.mefabc24.werewolf.game.GameState
 import com.mefabc24.werewolf.lobby.Lobby
 import com.mefabc24.werewolf.lobby.LobbyController
-import com.mefabc24.werewolf.network.ConnectedResponse
-import com.mefabc24.werewolf.network.Event
-import com.mefabc24.werewolf.network.PlayerJoinedEvent
-import com.mefabc24.werewolf.network.PlayerLeftEvent
-import com.mefabc24.werewolf.network.Request
-import com.mefabc24.werewolf.network.Response
+import com.mefabc24.werewolf.network.*
 import com.mefabc24.werewolf.player.Player
 import com.mefabc24.werewolf.request.RequestHandler
 import io.ktor.server.application.install
@@ -25,11 +20,18 @@ import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import io.ktor.websocket.send
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 class GameServer {
     private var server: EmbeddedServer<*,*>? = null
     private val clients = mutableMapOf<Int, WebSocketSession>()
+
+    private val scope = CoroutineScope(Dispatchers.Default)
+    private var eventJob: Job? = null
 
     private val lobby = Lobby()
     private val lobbyController = LobbyController(lobby)
@@ -42,6 +44,20 @@ class GameServer {
     private val requestHandler = RequestHandler(gameController, lobbyController)
 
     fun start() {
+        if (server != null) return
+
+        eventJob = scope.launch {
+            gameController.events.collect { gameEvent ->
+                if (gameEvent.recipients.isEmpty()) {
+                    broadcast(gameEvent.event)
+                } else {
+                    gameEvent.recipients.forEach { playerId ->
+                        send(playerId, gameEvent.event)
+                    }
+                }
+            }
+        }
+
         server = embeddedServer(Netty, 8080) {
             install(WebSockets)
 
@@ -57,7 +73,11 @@ class GameServer {
                         return@webSocket
                     }
 
-                    val name = call.request.queryParameters["name"] ?: return@webSocket  // will be used later when Player model exists
+                    val name = call.request.queryParameters["name"]
+                        ?.trim()
+                        ?.takeIf { it.isNotEmpty() }
+                        ?: return@webSocket
+
                     val playerId = nextPlayerId++
 
                     val player = Player(playerId, name)
@@ -84,6 +104,9 @@ class GameServer {
     fun stop() {
         server?.stop(500, 1000)
         server = null
+
+        eventJob?.cancel()
+        eventJob = null
     }
 
     private suspend fun handleConnection(playerId: Int, session: WebSocketSession) {
@@ -91,7 +114,16 @@ class GameServer {
             for (frame in session.incoming) {
                 if (frame is Frame.Text) {
                     val message = frame.readText()
-                    val request = Json.decodeFromString<Request>(message)
+
+                    val request = try {
+                        Json.decodeFromString<Request>(message)
+                    } catch (_: Exception) {
+                        send(
+                            playerId = playerId,
+                            ErrorResponse("Invalid request")
+                        )
+                        continue
+                    }
 
                     val result = requestHandler.handle(playerId, request)
 
@@ -121,6 +153,13 @@ class GameServer {
         response: Response
     ) {
         clients[playerId]?.send(Json.encodeToString<Response>(response))
+    }
+
+    private suspend fun send(
+        playerId: Int,
+        event: Event
+    ) {
+        clients[playerId]?.send(Json.encodeToString<Event>(event))
     }
 
     private suspend fun broadcast(event: Event) {

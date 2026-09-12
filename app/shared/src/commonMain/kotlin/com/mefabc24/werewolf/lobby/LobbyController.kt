@@ -2,6 +2,7 @@ package com.mefabc24.werewolf.lobby
 
 import com.mefabc24.werewolf.player.Player
 import com.mefabc24.werewolf.player.PlayerInfo
+import com.mefabc24.werewolf.settings.GameSettings
 
 class LobbyController(private val lobby: Lobby) {
     fun join(player: Player) {
@@ -16,6 +17,12 @@ class LobbyController(private val lobby: Lobby) {
 
         return player
     }
+
+    fun updateSettings(settings: GameSettings) {
+        lobby.settings = settings
+    }
+
+    fun getSettings(): GameSettings = lobby.settings
 
     fun isHost(playerId: Int): Boolean = lobby.hostPlayerId == playerId
 

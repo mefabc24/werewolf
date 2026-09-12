@@ -5,6 +5,5 @@ enum class GamePhase {
     START,
     NIGHT,
     DAY,
-    VOTING,
     END
 }

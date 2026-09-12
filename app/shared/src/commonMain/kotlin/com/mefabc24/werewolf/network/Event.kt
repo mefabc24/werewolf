@@ -1,6 +1,11 @@
 package com.mefabc24.werewolf.network
 
 import com.mefabc24.werewolf.game.ClientGameState
+import com.mefabc24.werewolf.game.DayPhase
+import com.mefabc24.werewolf.game.DeathCause
+import com.mefabc24.werewolf.game.NightPhase
+import com.mefabc24.werewolf.player.role.Role
+import com.mefabc24.werewolf.player.role.Team
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -30,3 +35,53 @@ data class MessageEvent(
 
 @Serializable
 data class GameStartedEvent(val gameState: ClientGameState) : Event
+
+@Serializable
+data object NightStartedEvent : Event
+
+@Serializable
+data class NightPhaseStartedEvent(val phase: NightPhase) : Event
+
+@Serializable
+data object WerewolfTurnEvent : Event
+
+@Serializable
+data class WitchTurnEvent(
+    val attackedPlayerIds: Set<Int>
+) : Event
+
+@Serializable
+data object SeerTurnEvent : Event
+
+@Serializable
+data class DayPhaseStartedEvent(val phase: DayPhase) : Event
+
+@Serializable
+data class PlayerVotedEvent(val playerId: Int) : Event
+
+@Serializable
+data class VotingFinishedEvent(val killedPlayerId: Int?) : Event
+
+@Serializable
+data object DayStartedEvent : Event
+
+@Serializable
+data class NightEndedEvent(val killedPlayerIds: Set<Int>) : Event
+
+@Serializable
+data class RoundStartedEvent(val round: Int) : Event
+
+@Serializable
+data class YouDiedEvent(val cause: DeathCause) : Event
+
+@Serializable
+data class RoleRevealEvent(
+    val playerId: Int,
+    val role: Role
+) : Event
+
+@Serializable
+data class GameWonEvent(val winningTeam: Team) : Event
+
+@Serializable
+data object GameEndedEvent : Event

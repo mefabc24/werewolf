@@ -1,5 +1,26 @@
 package com.mefabc24.werewolf.settings
 
+import com.mefabc24.werewolf.player.role.OptionalRole
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class GameSettings(
-    var werewolfAmount: Int = 2
-)
+    val werewolfAmount: Int = 1,
+
+    val canWitchUseBothPotions: Boolean = true,
+    val canWitchHealSelf: Boolean = true,
+    val canWitchKillWitch: Boolean = true,
+
+    val voteTimeSeconds: Int = -1,
+    val discussionTimeSeconds: Int = 0,
+    val nightRoleActingTimeSeconds: Int = -1,
+
+    val optionalRoles: Map<OptionalRole, Int> = mapOf(
+        OptionalRole.WITCH to 1,
+        OptionalRole.SEER to 1
+    )
+) {
+    init {
+        require(werewolfAmount >= SettingConstraints.MIN_WEREWOLVES)
+    }
+}

@@ -12,6 +12,9 @@ dependencies {
     implementation(project(":app:shared"))
     implementation(project(":server"))
 
+    implementation(libs.compose.material3)
+    implementation(libs.compose.components.resources)
+
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-websockets:$ktorVersion")
@@ -22,6 +25,11 @@ dependencies {
     implementation(libs.kotlinx.coroutinesSwing)
 
     implementation(libs.compose.uiToolingPreview)
+}
+
+compose.resources {
+    packageOfResClass = "com.mefabc24.werewolf.resources"
+    generateResClass = always
 }
 
 compose.desktop {

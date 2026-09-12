@@ -3,8 +3,8 @@ package com.mefabc24.werewolf.player.role
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object Werewolf : NightRole {
-    override val name = "Werewolf"
-    override val team = Team.WEREWOLVES
+data object Seer : NightRole {
+    override val name = "Seer"
+    override val team = Team.VILLAGE
     override val nightActionMode = NightActionMode.SIMULTANEOUS
 }

@@ -21,3 +21,9 @@ data object GameStartedResponse : Response
 
 @Serializable
 data class ErrorResponse(val message: String) : Response
+
+@Serializable
+data object ActionAcceptedResponse : Response
+
+@Serializable
+data object VoteAcceptedResponse : Response

@@ -18,19 +18,28 @@ import kotlinx.coroutines.Dispatchers
 import io.ktor.http.*
 
 class GameClient {
-    private val state = ClientState()
+    private val clientState = ClientState()
+
+    val gameState
+        get() = clientState.gameState
+
+    val selfPlayer
+        get() = clientState.selfPlayer
 
     private var session: DefaultClientWebSocketSession? = null
     private var receiveJob: Job? = null
+    private val scope = CoroutineScope(Dispatchers.Default)
 
-    private val eventHandler = EventHandler(state)
-    private val responseHandler = ResponseHandler(state)
+    private val eventHandler = EventHandler(clientState)
+    private val responseHandler = ResponseHandler(clientState)
 
     private val client = HttpClient(CIO) {
         install(WebSockets)
     }
 
     suspend fun connect(name: String) {
+        if (session != null) return
+
         session = client.webSocketSession {
             url {
                 host = "localhost"
@@ -40,8 +49,8 @@ class GameClient {
             }
         }
 
-        receiveJob = CoroutineScope(Dispatchers.Default).launch {
-            receiveMessage()
+        receiveJob = scope.launch {
+            receiveMessages()
         }
     }
 
@@ -60,7 +69,7 @@ class GameClient {
         currentSession.send(message)
     }
 
-    private suspend fun receiveMessage() {
+    private suspend fun receiveMessages() {
         val currentSession = session ?: return
 
         try {
@@ -78,16 +87,23 @@ class GameClient {
 
     private fun handleMessage(message: String) {
         try {
-            val response = Json.decodeFromString<Response>(message)
-            responseHandler.handle(response)
+            Json.decodeFromString<Response>(message)
+        } catch (_: Exception) {
+            null
+        }?.let {
+            responseHandler.handle(it)
             return
-        } catch (_: Exception) {}
+        }
 
         try {
-            val event = Json.decodeFromString<Event>(message)
-            eventHandler.handle(event)
+            Json.decodeFromString<Event>(message)
+        } catch (_: Exception) {
+            null
+        }?.let {
+            eventHandler.handle(it)
             return
-        } catch (_: Exception) {}
+        }
 
+        println("Unknown server message: $message")
     }
 }

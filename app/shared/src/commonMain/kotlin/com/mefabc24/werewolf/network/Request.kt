@@ -16,3 +16,18 @@ data class MessageRequest(
 
 @Serializable
 data object StartGameRequest : Request
+
+@Serializable
+data class VoteRequest(val targetId: Int) : Request
+
+@Serializable
+data class WerewolfActionRequest(val targetId: Int?) : Request
+
+@Serializable
+data class WitchActionRequest(
+    val healTargetId: Int? = null,
+    val killTargetId: Int? = null
+) : Request
+
+@Serializable
+data class SeerActionRequest(val targetId: Int?) : Request
