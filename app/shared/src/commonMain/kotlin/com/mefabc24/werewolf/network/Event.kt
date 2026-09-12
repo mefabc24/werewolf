@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface Event
 
-// Platzhalter und Lobby
+// Placeholder and lobby
 @Serializable
 data object PlaceholderEvent : Event
 
@@ -33,7 +33,7 @@ data class MessageEvent(
     val message: String
 ) : Event
 
-// Spielstart und Rundenbeginn
+// Game start and round beginning
 @Serializable
 data class GameStartedEvent(val gameState: ClientGameState) : Event
 
@@ -69,7 +69,7 @@ data object HunterTurnEvent : Event
 @Serializable
 data class NightEndedEvent(val killedPlayerIds: Set<Int>) : Event
 
-// Tagesphase und Abstimmung
+// Day phase and voting
 @Serializable
 data object DayStartedEvent : Event
 
@@ -88,7 +88,7 @@ data class PlayerVotedEvent(val playerId: Int) : Event
 @Serializable
 data class VotingFinishedEvent(val killedPlayerId: Int?) : Event
 
-// Spielende
+// Game end
 @Serializable
 data class GameWonEvent(val winningTeam: Team) : Event
 

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface Request
 
-// Placeholder
+// General requests
 @Serializable
 data object PlaceholderRequest : Request
 
@@ -14,12 +14,15 @@ data class MessageRequest(
     val message: String
 ) : Request
 
+// Game start
 @Serializable
 data object StartGameRequest : Request
 
+// Day voting
 @Serializable
 data class VoteRequest(val targetId: Int) : Request
 
+// Night actions
 @Serializable
 data class WerewolfActionRequest(val targetId: Int?) : Request
 

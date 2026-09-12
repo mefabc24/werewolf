@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface Response
 
-// Placeholder
+// Connection and lobby
 @Serializable
 data object PlaceholderResponse : Response
 
@@ -16,14 +16,17 @@ data class ConnectedResponse(
     val players: List<PlayerInfo>
 ) : Response
 
+// Game start
 @Serializable
 data object GameStartedResponse : Response
 
-@Serializable
-data class ErrorResponse(val message: String) : Response
-
+// Actions
 @Serializable
 data object ActionAcceptedResponse : Response
 
 @Serializable
 data object VoteAcceptedResponse : Response
+
+// Errors
+@Serializable
+data class ErrorResponse(val message: String) : Response
