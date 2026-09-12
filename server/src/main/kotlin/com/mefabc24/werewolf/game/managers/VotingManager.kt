@@ -2,6 +2,7 @@ package com.mefabc24.werewolf.game.managers
 
 import com.mefabc24.werewolf.game.GameState
 import com.mefabc24.werewolf.game.Vote
+import com.mefabc24.werewolf.player.role.Mayor
 import kotlinx.coroutines.CompletableDeferred
 import kotlin.time.Duration
 import kotlinx.coroutines.withTimeoutOrNull
@@ -39,6 +40,8 @@ class VotingManager(
             return false
         }
 
+        val voterRole = gameState.players.find { it.id == voterId }?.role ?: return false
+
         gameState.votes.add(
             Vote(voterId, targetId)
         )
@@ -54,8 +57,14 @@ class VotingManager(
 
     private fun calculateResult(): Int? {
         val voteCounts = gameState.votes
-            .groupingBy { it.targetId }
-            .eachCount()
+            .groupBy { it.targetId }
+            .mapValues { (_, votes) ->
+                votes.sumOf { vote ->
+                    val voter = gameState.players.first { it.id == vote.voterId }
+
+                    if (voter.role == Mayor) 2 else 1
+                }
+            }
 
         val highestCount = voteCounts.values.maxOrNull()
             ?: return null

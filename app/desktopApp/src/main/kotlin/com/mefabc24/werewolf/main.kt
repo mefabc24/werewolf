@@ -124,6 +124,7 @@ private fun printGameState(gameState: ClientGameState) {
 
     val gray = "\u001B[90m"
     val red = "\u001B[31m"
+    val orange = "\u001B[38;5;208m"
     val green = "\u001B[32m"
     val yellow = "\u001B[33m"
     val blue = "\u001B[34m"
@@ -156,6 +157,7 @@ private fun printGameState(gameState: ClientGameState) {
             "Werewolf" -> "$red${player.role}$reset"
             "Witch" -> "$purple${player.role}$reset"
             "Seer" -> "$blue${player.role}$reset"
+            "Mayor" -> "$orange${player.role}$reset"
             "Villager" -> "${gray}${player.role}$reset"
             else -> "${gray}Unknown$reset"
         }

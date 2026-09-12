@@ -17,7 +17,8 @@ data class GameSettings(
 
     val optionalRoles: Map<OptionalRole, Int> = mapOf(
         OptionalRole.WITCH to 1,
-        OptionalRole.SEER to 1
+        OptionalRole.SEER to 0,
+        OptionalRole.MAYOR to 1,
     )
 ) {
     init {

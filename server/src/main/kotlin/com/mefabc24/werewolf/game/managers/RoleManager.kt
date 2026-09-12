@@ -2,6 +2,7 @@ package com.mefabc24.werewolf.game.managers
 
 import com.mefabc24.werewolf.game.GameState
 import com.mefabc24.werewolf.player.Player
+import com.mefabc24.werewolf.player.role.Mayor
 import com.mefabc24.werewolf.player.role.OptionalRole
 import com.mefabc24.werewolf.player.role.Role
 import com.mefabc24.werewolf.player.role.Seer
@@ -25,10 +26,7 @@ class RoleManager(
 
         settings.optionalRoles.forEach { (optionalRole, amount) ->
             repeat(amount) {
-                when (optionalRole) {
-                    OptionalRole.WITCH -> roles.add(Witch)
-                    OptionalRole.SEER -> roles.add(Seer)
-                }
+                roles.add(optionalRole.role)
             }
         }
 

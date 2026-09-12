@@ -13,6 +13,7 @@ import com.mefabc24.werewolf.game.role.WitchState
 import com.mefabc24.werewolf.network.*
 import com.mefabc24.werewolf.player.Player
 import com.mefabc24.werewolf.player.PlayerInfo
+import com.mefabc24.werewolf.player.role.Mayor
 import com.mefabc24.werewolf.player.role.Seer
 import com.mefabc24.werewolf.player.role.Team
 import com.mefabc24.werewolf.player.role.Villager
@@ -63,6 +64,7 @@ class GameController(
 
                 is Werewolf -> {}
                 is Villager -> {}
+                is Mayor -> {}
                 null -> error("Player ${player.id} has no role")
             }
         }
