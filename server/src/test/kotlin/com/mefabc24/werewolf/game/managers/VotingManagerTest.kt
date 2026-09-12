@@ -2,6 +2,7 @@ package com.mefabc24.werewolf.game.managers
 
 import com.mefabc24.werewolf.game.GameState
 import com.mefabc24.werewolf.player.Player
+import com.mefabc24.werewolf.player.role.Villager
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -104,7 +105,7 @@ class VotingManagerTest {
     private fun stateWithPlayers(playerCount: Int): GameState =
         GameState(
             players = (1..playerCount)
-                .map { Player(it, "Player $it") }
+                .map { Player(it, "Player $it", Villager) }
                 .toMutableList()
         )
 }

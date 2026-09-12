@@ -21,9 +21,7 @@ import com.mefabc24.werewolf.network.MessageEvent
 import com.mefabc24.werewolf.network.MessageRequest
 import com.mefabc24.werewolf.network.NightEndedEvent
 import com.mefabc24.werewolf.network.NightPhaseStartedEvent
-import com.mefabc24.werewolf.network.PlaceholderEvent
-import com.mefabc24.werewolf.network.PlaceholderRequest
-import com.mefabc24.werewolf.network.PlaceholderResponse
+import com.mefabc24.werewolf.network.PlayerDiedEvent
 import com.mefabc24.werewolf.network.PlayerJoinedEvent
 import com.mefabc24.werewolf.network.PlayerLeftEvent
 import com.mefabc24.werewolf.network.PlayerVotedEvent
@@ -41,20 +39,16 @@ import com.mefabc24.werewolf.network.WerewolfActionRequest
 import com.mefabc24.werewolf.network.WerewolfTurnEvent
 import com.mefabc24.werewolf.network.WitchActionRequest
 import com.mefabc24.werewolf.network.WitchTurnEvent
-import com.mefabc24.werewolf.network.YouDiedEvent
 import com.mefabc24.werewolf.player.Player
 import com.mefabc24.werewolf.player.PlayerInfo
 import com.mefabc24.werewolf.player.role.NightActionMode
 import com.mefabc24.werewolf.player.role.OptionalRole
-import com.mefabc24.werewolf.player.role.Role
 import com.mefabc24.werewolf.player.role.Seer
 import com.mefabc24.werewolf.player.role.Team
 import com.mefabc24.werewolf.player.role.Villager
 import com.mefabc24.werewolf.player.role.Werewolf
 import com.mefabc24.werewolf.player.role.Witch
 import com.mefabc24.werewolf.settings.GameSettings
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -72,8 +66,8 @@ class SharedCommonTest {
         val settings = GameSettings()
 
         assertEquals(1, settings.werewolfAmount)
-        assertEquals(1, settings.optionalRoles[OptionalRole.WITCH])
-        assertEquals(1, settings.optionalRoles[OptionalRole.SEER])
+        assertEquals(0, settings.optionalRoles[OptionalRole.WITCH])
+        assertEquals(0, settings.optionalRoles[OptionalRole.SEER])
         assertTrue(settings.canWitchUseBothPotions)
         assertTrue(settings.canWitchHealSelf)
         assertTrue(settings.canWitchKillWitch)
@@ -220,7 +214,6 @@ class SharedCommonTest {
     @Test
     fun everyRequestTypeSurvivesPolymorphicSerialization() {
         val requests: List<Request> = listOf(
-            PlaceholderRequest,
             MessageRequest("hello"),
             StartGameRequest,
             VoteRequest(targetId = 4),
@@ -236,7 +229,6 @@ class SharedCommonTest {
     @Test
     fun everyResponseTypeSurvivesPolymorphicSerialization() {
         val responses: List<Response> = listOf(
-            PlaceholderResponse,
             ConnectedResponse(1, listOf(PlayerInfo(1, "Ada", Witch))),
             GameStartedResponse,
             ErrorResponse("invalid action"),
@@ -262,7 +254,6 @@ class SharedCommonTest {
             settings = GameSettings(optionalRoles = mapOf(OptionalRole.WITCH to 1))
         )
         val events: List<Event> = listOf(
-            PlaceholderEvent,
             PlayerJoinedEvent(1, "Ada"),
             PlayerLeftEvent(1, "Ada"),
             MessageEvent(1, "hello"),
@@ -278,7 +269,7 @@ class SharedCommonTest {
             VotingFinishedEvent(2),
             NightEndedEvent(setOf(2)),
             RoundStartedEvent(3),
-            YouDiedEvent(DeathCause.NIGHT),
+            PlayerDiedEvent(2,DeathCause.NIGHT),
             RoleRevealEvent(2, Villager),
             GameWonEvent(Team.VILLAGE),
             GameEndedEvent

@@ -37,7 +37,12 @@ class PhaseManagerTest {
                 Player(3, "Seer", Seer),
                 Player(4, "Villager", Villager)
             ),
-            settings = GameSettings(),
+            settings = GameSettings(
+                optionalRoles = mapOf(
+                    OptionalRole.WITCH to 1,
+                    OptionalRole.SEER to 1
+                )
+            ),
             witchStates = mutableMapOf(2 to WitchState())
         )
 

@@ -7,9 +7,6 @@ import com.mefabc24.werewolf.lobby.LobbyController
 import com.mefabc24.werewolf.network.ErrorResponse
 import com.mefabc24.werewolf.network.MessageEvent
 import com.mefabc24.werewolf.network.MessageRequest
-import com.mefabc24.werewolf.network.PlaceholderEvent
-import com.mefabc24.werewolf.network.PlaceholderRequest
-import com.mefabc24.werewolf.network.PlaceholderResponse
 import com.mefabc24.werewolf.network.SeerActionRequest
 import com.mefabc24.werewolf.network.StartGameRequest
 import com.mefabc24.werewolf.network.VoteRequest
@@ -21,14 +18,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class RequestHandlerTest {
-
-    @Test
-    fun placeholderRequestProducesBothPlaceholderMessages() = runTest {
-        val result = handler().handle(playerId = 7, request = PlaceholderRequest)
-
-        assertEquals(PlaceholderResponse, result.response)
-        assertEquals(PlaceholderEvent, result.event)
-    }
 
     @Test
     fun chatMessageKeepsTheAuthenticatedSenderId() = runTest {
