@@ -13,11 +13,8 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
 import com.mefabc24.werewolf.resources.Res
 import com.mefabc24.werewolf.resources.bg
@@ -26,10 +23,13 @@ import com.mefabc24.werewolf.resources.lobby
 import com.mefabc24.werewolf.resources.settings
 import com.mefabc24.werewolf.resources.title
 import com.mefabc24.werewolf.resources.wolf
+import com.mefabc24.werewolf.ui.components.AppShell
 import com.mefabc24.werewolf.ui.components.MenuButton
 
 @Composable
-fun TitleScreen() {
+fun TitleScreen(
+    onPlayClick: () -> Unit,
+) {
     AppShell {
         Image(
             painter = painterResource(Res.drawable.bg),
@@ -66,7 +66,7 @@ fun TitleScreen() {
                     icon = painterResource(Res.drawable.wolf),
                     containerColor = Color(0xFF8E2525),
                     borderColor = Color(0xFFB93636),
-                    onClick = { }
+                    onClick = onPlayClick
                 )
 
                 MenuButton(
