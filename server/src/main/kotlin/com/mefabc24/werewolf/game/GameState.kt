@@ -1,7 +1,6 @@
 package com.mefabc24.werewolf.game
 
-import com.mefabc24.werewolf.game.role.SeerState
-import com.mefabc24.werewolf.game.role.WitchState
+import com.mefabc24.werewolf.game.role.states.*
 import com.mefabc24.werewolf.player.Player
 import com.mefabc24.werewolf.settings.GameSettings
 
@@ -17,4 +16,5 @@ data class GameState(
     // role states
     var witchStates: MutableMap<Int, WitchState> = mutableMapOf(),
     var seerStates: MutableMap<Int, SeerState> = mutableMapOf(),
+    var lawyerStates: MutableMap<Int, LawyerState> = mutableMapOf(),
 )

@@ -45,6 +45,14 @@ class EventHandler(
                 println("Game started. Your role: ${clientState.selfPlayer?.role}")
             }
 
+            is LawyerClientAssignedEvent -> {
+                val playerName = clientState.gameState.players
+                    .find { it.id == event.clientId }
+                    ?.playerName
+
+                println("Your client is: $playerName")
+            }
+
             is NightStartedEvent -> {
                 clientState.gameState = clientState.gameState.copy(
                     gamePhase = GamePhase.NIGHT,

@@ -19,7 +19,8 @@ data class GameSettings(
         OptionalRole.WITCH to 0,
         OptionalRole.SEER to 0,
         OptionalRole.MAYOR to 0,
-        OptionalRole.HUNTER to 1,
+        OptionalRole.HUNTER to 0,
+        OptionalRole.LAWYER to 1,
     )
 ) {
     init {

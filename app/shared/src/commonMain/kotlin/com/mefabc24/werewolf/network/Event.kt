@@ -45,6 +45,11 @@ data class RoleRevealEvent(
 ) : Event
 
 @Serializable
+data class LawyerClientAssignedEvent(
+    val clientId: Int
+) : Event
+
+@Serializable
 data object NightStartedEvent : Event
 
 @Serializable

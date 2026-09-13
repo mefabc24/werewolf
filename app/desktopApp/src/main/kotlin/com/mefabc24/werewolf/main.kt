@@ -160,6 +160,7 @@ private fun printGameState(gameState: ClientGameState) {
             "Mayor" -> "$orange${player.role}$reset"
             "Hunter" -> "$green${player.role}$reset"
             "Villager" -> "${gray}${player.role}$reset"
+            "Lawyer" -> "$yellow${player.role}$reset"
             else -> "${gray}Unknown$reset"
         }
 

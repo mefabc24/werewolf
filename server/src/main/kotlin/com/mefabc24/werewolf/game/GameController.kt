@@ -3,8 +3,7 @@ package com.mefabc24.werewolf.game
 import com.mefabc24.werewolf.game.actions.*
 import com.mefabc24.werewolf.game.managers.*
 import com.mefabc24.werewolf.game.results.NightResult
-import com.mefabc24.werewolf.game.role.SeerState
-import com.mefabc24.werewolf.game.role.WitchState
+import com.mefabc24.werewolf.game.role.states.*
 import com.mefabc24.werewolf.network.*
 import com.mefabc24.werewolf.player.Player
 import com.mefabc24.werewolf.player.PlayerInfo
@@ -52,19 +51,43 @@ class GameController(
                 is Witch -> gameState.witchStates[player.id] = WitchState()
                 is Seer -> gameState.seerStates[player.id] = SeerState()
 
-                is Hunter -> {}
-                is Werewolf -> {}
-                is Villager -> {}
-                is Mayor -> {}
+                is Lawyer -> {
+                    val client = roleManager.getRandomWerewolf()
+                        ?: error("Cannot assign Lawyer without a Werewolf")
+
+                    gameState.lawyerStates[player.id] = LawyerState(client.id)
+                }
+
+                is Hunter, Werewolf, Villager, Mayor -> {}
                 null -> error("Player ${player.id} has no role")
             }
         }
 
-        for ((id) in gameState.players) {
+        gameState.players.forEach { player ->
             notifyClients(
-                GameStartedEvent(generateClientGameState(id)),
-                setOf(id)
+                GameStartedEvent(generateClientGameState(player.id)),
+                setOf(player.id)
             )
+
+            if (player.role == Lawyer) {
+                val lawyerState = gameState.lawyerStates[player.id]
+                    ?: error("LawyerState for player ${player.id} not found")
+
+                val client = requirePlayer(lawyerState.clientId)
+
+                notifyClients(
+                    LawyerClientAssignedEvent(client.id),
+                    setOf(player.id)
+                )
+
+                notifyClients(
+                    RoleRevealEvent(
+                        client.id,
+                        client.role!!
+                    ),
+                    setOf(player.id)
+                )
+            }
         }
 
         gameJob = scope.launch { gameLoop() }
@@ -80,7 +103,9 @@ class GameController(
     }
 
     private suspend fun gameLoop() {
-        while (checkWinCondition() == null) {
+        while (true) {
+            if (checkAndHandleWin()) break
+
             notifyClients(RoundStartedEvent(gameState.round))
 
             night()
@@ -212,15 +237,15 @@ class GameController(
 
     private fun checkWinCondition(): Team? {
         val aliveWerewolves = gameState.players.count {
-            it.isAlive && it.role?.team == Team.WEREWOLVES
+            it.isAlive && it.role == Werewolf
         }
 
-        val aliveVillagers = gameState.players.count {
-            it.isAlive && it.role?.team == Team.VILLAGE
+        val aliveNonWerewolves = gameState.players.count {
+            it.isAlive && it.role != Werewolf
         }
 
         if (aliveWerewolves == 0) return Team.VILLAGE
-        if (aliveWerewolves >= aliveVillagers) return Team.WEREWOLVES
+        if (aliveWerewolves >= aliveNonWerewolves) return Team.WEREWOLVES
         return null
     }
 
@@ -402,6 +427,7 @@ class GameController(
 
         gameState.witchStates.clear()
         gameState.seerStates.clear()
+        gameState.lawyerStates.clear()
     }
 
     private suspend fun notifyClients(

@@ -45,6 +45,12 @@ class RoleManager(
         }
     }
 
+    fun getRandomWerewolf(): Player? {
+        return gameState.players
+            .filter { it.role == Werewolf }
+            .randomOrNull()
+    }
+
     fun getPlayersByTeam(team: Team): List<Player> =
         gameState.players.filter { it.role?.team == team }
 

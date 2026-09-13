@@ -6,5 +6,6 @@ enum class OptionalRole(
     WITCH(Witch),
     SEER(Seer),
     MAYOR(Mayor),
-    HUNTER(Hunter)
+    HUNTER(Hunter),
+    LAWYER(Lawyer),
 }

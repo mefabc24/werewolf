@@ -9,7 +9,7 @@ import com.mefabc24.werewolf.game.actions.SeerAction
 import com.mefabc24.werewolf.game.actions.WerewolfAction
 import com.mefabc24.werewolf.game.actions.WitchAction
 import com.mefabc24.werewolf.game.results.NightResult
-import com.mefabc24.werewolf.game.role.WitchState
+import com.mefabc24.werewolf.game.role.states.WitchState
 import com.mefabc24.werewolf.player.role.NightActionMode
 import com.mefabc24.werewolf.player.role.NightRole
 import com.mefabc24.werewolf.player.role.OptionalRole
