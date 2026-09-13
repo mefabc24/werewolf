@@ -1,4 +1,4 @@
-package com.mefabc24.werewolf.ui.screens
+package com.mefabc24.werewolf.ui.title
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -23,8 +23,8 @@ import com.mefabc24.werewolf.resources.lobby
 import com.mefabc24.werewolf.resources.settings
 import com.mefabc24.werewolf.resources.title
 import com.mefabc24.werewolf.resources.wolf
-import com.mefabc24.werewolf.ui.components.AppShell
-import com.mefabc24.werewolf.ui.components.MenuButton
+import com.mefabc24.werewolf.ui.common.components.AppShell
+import com.mefabc24.werewolf.ui.title.components.MenuButton
 
 @Composable
 fun TitleScreen(

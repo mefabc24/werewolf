@@ -1,4 +1,4 @@
-package com.mefabc24.werewolf.ui.components
+package com.mefabc24.werewolf.ui.common.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
